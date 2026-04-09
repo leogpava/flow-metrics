@@ -24,7 +24,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR" className={lexendDeca.variable}>
-      <body className="relative min-h-screen bg-flow-bg text-flow-text antialiased">
+      <body className="relative min-h-screen max-w-full overflow-x-clip bg-flow-bg text-flow-text antialiased">
         <MeshBackground />
         {children}
       </body>

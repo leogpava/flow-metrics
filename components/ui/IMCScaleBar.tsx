@@ -24,7 +24,7 @@ export function IMCScaleBar({ imc }: IMCScaleBarProps) {
   const markerPercent = ((clampedImc - SCALE_MIN) / SCALE_RANGE) * 100;
 
   return (
-    <div className="mt-3">
+    <div className="mt-3 min-w-0 max-w-full overflow-hidden">
       <div className="relative px-1">
         <div className="flex h-3 overflow-hidden rounded-full bg-white/20 ring-1 ring-black/5">
           {segments.map((segment) => {

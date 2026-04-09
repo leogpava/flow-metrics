@@ -28,7 +28,7 @@ export function GlassCard({
     <motion.div
       whileHover={hover ? { scale: 1.01 } : undefined}
       transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-      className={cn('glass-surface shadow-glass', paddingMap[padding], className)}
+      className={cn('glass-surface min-w-0 max-w-full overflow-x-clip shadow-glass', paddingMap[padding], className)}
     >
       {children}
     </motion.div>

@@ -1,4 +1,4 @@
-﻿import { LucideIcon } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -33,36 +33,47 @@ export function MetricCard({
   subtitleClassName,
   extra
 }: MetricCardProps) {
-  // Suporte a ambas as nomenclaturas (title/subtitle e label/sublabel)
   const displayLabel = label || title;
   const displaySublabel = sublabel || subtitle;
 
   return (
-    <GlassCard padding="md" className="h-full">
-      <div className="mb-4 flex items-center gap-3">
+    <GlassCard padding="md" className="h-full min-w-0">
+      <div className="mb-4 flex min-w-0 items-center gap-3">
         {Icon && (
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/45">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/45">
             <Icon className="h-5 w-5 text-flow-accent" />
           </div>
         )}
-        <span className="text-sm font-medium text-flow-text-soft">{displayLabel}</span>
+        <span className="min-w-0 break-words text-sm font-medium leading-5 text-flow-text-soft [overflow-wrap:anywhere]">
+          {displayLabel}
+        </span>
       </div>
 
-      <div className="flex items-baseline gap-1">
-        <p className={cn('text-xl font-semibold text-flow-text', valueClassName)}>{value}</p>
-        {unit && <span className="text-sm text-flow-text-muted">{unit}</span>}
+      <div className="flex min-w-0 flex-wrap items-baseline gap-x-1 gap-y-1">
+        <p
+          className={cn(
+            'min-w-0 break-words text-[clamp(1.05rem,4.8vw,1.25rem)] font-semibold leading-tight text-flow-text [overflow-wrap:anywhere]',
+            valueClassName
+          )}
+        >
+          {value}
+        </p>
+        {unit && <span className="break-words text-sm leading-5 text-flow-text-muted [overflow-wrap:anywhere]">{unit}</span>}
       </div>
 
       {classification && (
-        <p className={cn('mt-1 text-sm font-medium', classificationColor ? `text-[${classificationColor}]` : '')}>
+        <p className={cn('mt-1 break-words text-sm font-medium leading-5 [overflow-wrap:anywhere]', classificationColor ? `text-[${classificationColor}]` : '')}>
           {classification}
         </p>
       )}
 
-      {displaySublabel && <p className={cn('mt-1 text-sm text-flow-text-muted', subtitleClassName)}>{displaySublabel}</p>}
+      {displaySublabel && (
+        <p className={cn('mt-1 break-words text-sm leading-5 text-flow-text-muted [overflow-wrap:anywhere]', subtitleClassName)}>
+          {displaySublabel}
+        </p>
+      )}
 
-      {extra && <div className="mt-2">{extra}</div>}
+      {extra && <div className="mt-2 min-w-0 max-w-full">{extra}</div>}
     </GlassCard>
   );
 }
-

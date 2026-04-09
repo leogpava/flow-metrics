@@ -27,7 +27,7 @@ export function PillButton({
       whileTap={disabled ? undefined : { scale: 0.97 }}
       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        'inline-flex h-14 items-center justify-center gap-2 rounded-full px-8 text-base font-semibold transition duration-200',
+        'inline-flex min-w-0 max-w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-semibold transition duration-200 sm:h-14 sm:px-8',
         fullWidth && 'w-full',
         variant === 'primary' &&
           'border border-white/30 bg-[rgba(108,99,255,0.90)] text-white shadow-[0_14px_34px_rgba(108,99,255,0.24)] hover:brightness-105',
@@ -39,8 +39,8 @@ export function PillButton({
       disabled={disabled}
       {...props}
     >
-      <span>{children}</span>
-      {icon}
+      <span className="min-w-0 break-words text-center leading-5 [overflow-wrap:anywhere]">{children}</span>
+      {icon && <span className="shrink-0">{icon}</span>}
     </motion.button>
   );
 }
