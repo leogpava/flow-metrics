@@ -104,7 +104,7 @@ Notes:
 ### Installation
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/leogpava/flow-metrics
 cd FlowMetrics
 npm install
 ```
