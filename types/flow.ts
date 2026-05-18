@@ -42,4 +42,5 @@ export interface FlowState {
   email: string;
   emailSent: boolean;
   sessionId: string;
+  nps: number | null;
 }

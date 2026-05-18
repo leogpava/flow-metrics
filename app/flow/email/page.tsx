@@ -8,8 +8,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PillButton } from '@/components/ui/PillButton';
 import { StepTransition } from '@/components/ui/StepTransition';
-import { saveEmail, markEmailSent } from '@/features/flow/services/session-client';
+import { saveEmail, markEmailSent, saveNps } from '@/features/flow/services/session-client';
 import { useFlowHydrated, useFlowStore } from '@/features/flow/hooks/useFlowStore';
+import { cn } from '@/lib/utils';
 
 const reportItems = [
   'Score FlowMetrics completo',
@@ -28,10 +29,13 @@ export default function EmailPage() {
   const metrics = useFlowStore((state) => state.metrics);
   const sessionId = useFlowStore((state) => state.sessionId);
   const storedEmail = useFlowStore((state) => state.email);
+  const storedNps = useFlowStore((state) => state.nps);
   const setEmail = useFlowStore((state) => state.setEmail);
   const setEmailSent = useFlowStore((state) => state.setEmailSent);
+  const setNps = useFlowStore((state) => state.setNps);
 
-  const [email, setEmailInput] = useState(storedEmail || 'leogpava@gmail.com');
+  const [email, setEmailInput] = useState(storedEmail || '');
+  const [selectedNps, setSelectedNps] = useState<number | null>(storedNps);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,20 +47,31 @@ export default function EmailPage() {
   }, [hydrated, metrics, router, userData.nome]);
 
   useEffect(() => {
-    setEmailInput(storedEmail || 'leogpava@gmail.com');
+    setEmailInput(storedEmail || '');
   }, [storedEmail]);
 
+  useEffect(() => {
+    setSelectedNps(storedNps);
+  }, [storedNps]);
+
   const validEmail = useMemo(() => isValidEmail(email), [email]);
+  const canSendReport = validEmail && selectedNps !== null && !loading;
+
+  async function handleNpsSelect(value: number) {
+    setSelectedNps(value);
+    setNps(value);
+    await saveNps(sessionId, value);
+  }
 
   async function handleSubmit() {
-    if (!validEmail || loading || !metrics || !userData.nome) return;
+    if (!canSendReport || !metrics || !userData.nome || selectedNps === null) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      // Usar sempre leogpava@gmail.com para testes
-      const targetEmail = 'leogpava@gmail.com';
+      // Usar o email digitado pelo usuário
+      const targetEmail = email;
       setEmail(targetEmail);
 
       // Salvar e-mail no Supabase primeiro
@@ -68,6 +83,7 @@ export default function EmailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: targetEmail,
+          nps: selectedNps,
           nome: userData.nome,
           sexo: userData.sexo,
           idade: userData.idade,
@@ -117,13 +133,12 @@ export default function EmailPage() {
           <input
             type="email"
             value={email}
-            disabled
+            onChange={(e) => setEmailInput(e.target.value)}
             placeholder="seu@email.com"
-            className="glass-input h-14 w-full rounded-[14px] px-5 pr-12 text-base text-flow-text outline-none transition focus:border-flow-accent opacity-60"
+            className="glass-input h-14 w-full rounded-[14px] px-5 pr-12 text-base text-flow-text outline-none transition focus:border-flow-accent"
           />
           {validEmail && <Check className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-flow-success" />}
         </label>
-        <p className="mt-2 text-xs text-flow-text-muted">Email de teste: leogpava@gmail.com</p>
       </StepTransition>
 
       <div className="mt-7 space-y-3">
@@ -141,15 +156,37 @@ export default function EmailPage() {
         ))}
       </div>
 
+      <StepTransition delay={0.42} className="mt-7">
+        <p className="mx-auto max-w-sm text-sm font-medium text-flow-text">De 0 a 10, você recomendaria o FlowMetrics para um amigo?</p>
+        <div className="mt-4 grid grid-cols-6 gap-2 sm:grid-cols-11">
+          {Array.from({ length: 11 }, (_, value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => void handleNpsSelect(value)}
+              className={cn(
+                'h-11 rounded-full border text-sm font-semibold transition',
+                selectedNps === value ? 'border-flow-accent bg-flow-accent text-white' : 'border-white/80 bg-white/28 text-flow-text'
+              )}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+      </StepTransition>
+
       <StepTransition delay={0.5} className="mt-7">
         <PillButton
           fullWidth
-          disabled={!validEmail || loading}
+          disabled={!canSendReport}
           onClick={handleSubmit}
           icon={loading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
         >
-          {loading ? 'Enviando...' : 'Enviar meu relatório'}
+          {loading ? 'Enviando...' : 'Receber meu relatório completo'}
         </PillButton>
+        {selectedNps === null && (
+          <p className="mt-2 text-center text-xs text-flow-text-muted">Responda a avaliação acima para liberar o envio.</p>
+        )}
         {error && (
           <motion.p initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mt-2 text-center text-[13px] text-red-400">{error}</motion.p>
         )}

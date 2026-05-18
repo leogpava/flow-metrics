@@ -9,8 +9,6 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { PillButton } from '@/components/ui/PillButton';
 import { StepTransition } from '@/components/ui/StepTransition';
 import { useFlowHydrated, useFlowStore } from '@/features/flow/hooks/useFlowStore';
-import { saveNps } from '@/features/flow/services/session-client';
-import { cn } from '@/lib/utils';
 
 const particles = [
   { x: '-56px', y: '-68px', color: '#a8c8f8', delay: '0s' },
@@ -30,10 +28,8 @@ export default function ConfirmacaoPage() {
   const metrics = useFlowStore((state) => state.metrics);
   const email = useFlowStore((state) => state.email);
   const emailSent = useFlowStore((state) => state.emailSent);
-  const sessionId = useFlowStore((state) => state.sessionId);
   const reset = useFlowStore((state) => state.reset);
 
-  const [selectedNps, setSelectedNps] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -51,11 +47,6 @@ export default function ConfirmacaoPage() {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     return `Fiz minha análise de saúde no FlowMetrics e tirei ${metrics?.score ?? 0} pontos! Testa você também: ${appUrl}`;
   }, [metrics?.score]);
-
-  async function handleNpsSelect(value: number) {
-    setSelectedNps(value);
-    await saveNps(sessionId, value);
-  }
 
   async function handleCopy() {
     try {
@@ -98,24 +89,19 @@ export default function ConfirmacaoPage() {
       </StepTransition>
 
       <StepTransition delay={0.7} className="mt-7">
-        <p className="mx-auto max-w-sm text-sm font-medium text-flow-text">De 0 a 10, você recomendaria para um amigo?</p>
-        <div className="mt-4 grid grid-cols-6 gap-2 sm:grid-cols-11">
-          {Array.from({ length: 11 }, (_, value) => (
-            <button key={value} onClick={() => void handleNpsSelect(value)} className={cn('h-11 rounded-full border text-sm font-semibold transition', selectedNps === value ? 'border-flow-accent bg-flow-accent text-white' : 'border-white/80 bg-white/28 text-flow-text')}>
-              {value}
-            </button>
-          ))}
-        </div>
-      </StepTransition>
-
-      <StepTransition delay={0.9} className="mt-7">
         <PillButton variant="secondary" fullWidth onClick={handleCopy} icon={<Share2 className="h-4 w-4" />}>
           {copied ? 'Copiado!' : 'Compartilhar resultado'}
         </PillButton>
       </StepTransition>
 
-      <StepTransition delay={1} className="mt-5">
-        <button onClick={() => { reset(); router.push('/flow/dados'); }} className="inline-flex items-center gap-2 text-sm font-medium text-flow-text-soft transition hover:text-flow-accent">
+      <StepTransition delay={0.9} className="mt-5">
+        <button 
+          onClick={() => { 
+            reset(); 
+            router.push('/flow/dados'); 
+          }} 
+          className="inline-flex items-center gap-2 text-sm font-medium text-flow-text-soft transition hover:text-flow-accent"
+        >
           Fazer nova análise
           <ArrowRight className="h-4 w-4" />
         </button>

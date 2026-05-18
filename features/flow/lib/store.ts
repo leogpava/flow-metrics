@@ -11,6 +11,7 @@ interface FlowStore extends FlowState {
   setMetrics: (metrics: HealthMetrics) => void;
   setEmail: (email: string) => void;
   setEmailSent: (sent: boolean) => void;
+  setNps: (nps: number | null) => void;
   setInsight: (insight: string) => void;
   nextStep: () => void;
   setStep: (step: number) => void;
@@ -23,7 +24,8 @@ const initialState: FlowState = {
   metrics: null,
   email: '',
   emailSent: false,
-  sessionId: uuidv4()
+  sessionId: uuidv4(),
+  nps: null
 };
 
 export const useFlowStore = create<FlowStore>()(
@@ -34,6 +36,7 @@ export const useFlowStore = create<FlowStore>()(
       setMetrics: (metrics) => set({ metrics }),
       setEmail: (email) => set({ email }),
       setEmailSent: (emailSent) => set({ emailSent }),
+      setNps: (nps) => set({ nps }),
       setInsight: (insight) => set((state) => ({
         metrics: state.metrics ? { ...state.metrics, insight } : null
       })),
@@ -54,7 +57,8 @@ export const useFlowStore = create<FlowStore>()(
         metrics: state.metrics,
         email: state.email,
         emailSent: state.emailSent,
-        sessionId: state.sessionId
+        sessionId: state.sessionId,
+        nps: state.nps
       })
     }
   )
